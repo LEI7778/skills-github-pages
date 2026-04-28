@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>法学论文选题管理工具</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --danger: #dc2626;
+      --border: #e5e7eb;
+      --ok: #16a34a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+    }
+
+    .sub {
+      color: var(--muted);
+      margin: 0 0 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea, button {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      outline: none;
+      background: #fff;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover { opacity: 0.92; }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.2fr repeat(2, minmax(120px, 0.4fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      padding: 10px 8px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #111827;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .table-wrap {
+      max-height: 66vh;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 0 4px 4px 0;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #fff;
+      background: var(--ok);
+    }
+
+    .progress-line {
+      background: #eef2ff;
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-line > span {
+      display: block;
+      height: 100%;
+      background: #4f46e5;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .empty {
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>法学论文选题管理工具</h1>
+    <p class="sub">支持：添加题目、研究方向、关键词、参考文献、案例、写作进度；并支持搜索、筛选与导出 Excel。</p>
+
+    <div class="grid">
+      <section class="card">
+        <h2 class="section-title" id="formTitle">新增选题</h2>
+        <form id="topicForm">
+          <div class="field">
+            <label for="title">论文题目 *</label>
+            <input id="title" required placeholder="例如：人工智能生成内容的侵权责任研究" />
+          </div>
+
+          <div class="field">
+            <label for="direction">研究方向 *</label>
+            <input id="direction" required placeholder="例如：民法、刑法、知识产权法、行政法" />
+          </div>
+
+          <div class="field">
+            <label for="keywords">关键词（英文逗号或中文逗号分隔）</label>
+            <input id="keywords" placeholder="例如：算法推荐，侵权责任，平台治理" />
+          </div>
+
+          <div class="field">
+            <label for="references">参考文献（每行一条）</label>
+            <textarea id="references" placeholder="例如：\n王某：《平台责任研究》，法律出版社，2024。\n李某：《网络侵权法理》，中国法制出版社，2023。"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="cases">案例（每行一条）</label>
+            <textarea id="cases" placeholder="例如：\n某平台算法推荐侵权案（2025）\n某短视频平台著作权案（2024）"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="stage">写作阶段</label>
+            <select id="stage">
+              <option value="选题构思">选题构思</option>
+              <option value="文献整理">文献整理</option>
+              <option value="提纲撰写">提纲撰写</option>
+              <option value="初稿完成">初稿完成</option>
+              <option value="修改完善">修改完善</option>
+              <option value="定稿">定稿</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="progress">写作进度（0-100）</label>
+            <input id="progress" type="number" min="0" max="100" value="0" />
+          </div>
+
+          <input type="hidden" id="topicId" />
+
+          <div class="row">
+            <button type="submit" class="btn-primary" id="submitBtn">保存选题</button>
+            <button type="button" class="btn-secondary" id="resetBtn">清空/取消编辑</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title">选题列表</h2>
+
+        <div class="toolbar">
+          <input id="searchInput" placeholder="搜索题目、方向、关键词、文献、案例" />
+          <select id="directionFilter">
+            <option value="">全部方向</option>
+          </select>
+          <select id="stageFilter">
+            <option value="">全部阶段</option>
+            <option value="选题构思">选题构思</option>
+            <option value="文献整理">文献整理</option>
+            <option value="提纲撰写">提纲撰写</option>
+            <option value="初稿完成">初稿完成</option>
+            <option value="修改完善">修改完善</option>
+            <option value="定稿">定稿</option>
+          </select>
+        </div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <button class="btn-secondary" id="exportBtn" type="button">导出 Excel</button>
+          <button class="btn-danger" id="clearAllBtn" type="button">清空全部数据</button>
+          <span class="muted" id="countInfo"></span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="min-width:180px;">题目</th>
+                <th style="min-width:120px;">方向</th>
+                <th style="min-width:160px;">关键词</th>
+                <th style="min-width:200px;">文献与案例</th>
+                <th style="min-width:160px;">进度</th>
+                <th style="min-width:120px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+          <div class="empty" id="emptyState" hidden>暂无数据，请先在左侧新增一个选题。</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const STORAGE_KEY = 'law-paper-topics-v1';
+
+    const elements = {
+      form: document.getElementById('topicForm'),
+      formTitle: document.getElementById('formTitle'),
+      topicId: document.getElementById('topicId'),
+      title: document.getElementById('title'),
+      direction: document.getElementById('direction'),
+      keywords: document.getElementById('keywords'),
+      references: document.getElementById('references'),
+      cases: document.getElementById('cases'),
+      stage: document.getElementById('stage'),
+      progress: document.getElementById('progress'),
+      submitBtn: document.getElementById('submitBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      searchInput: document.getElementById('searchInput'),
+      directionFilter: document.getElementById('directionFilter'),
+      stageFilter: document.getElementById('stageFilter'),
+      exportBtn: document.getElementById('exportBtn'),
+      clearAllBtn: document.getElementById('clearAllBtn'),
+      tableBody: document.getElementById('tableBody'),
+      emptyState: document.getElementById('emptyState'),
+      countInfo: document.getElementById('countInfo')
+    };
+
+    let topics = loadTopics();
+
+    function loadTopics() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        console.error('读取本地数据失败:', error);
+        return [];
+      }
+    }
+
+    function saveTopics() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(topics));
+    }
+
+    function normalizeKeywords(input) {
+      return input
+        .split(/[，,]/)
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+
+    function normalizeLines(input) {
+      return input
+        .split(/\n+/)
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+
+    function resetForm() {
+      elements.form.reset();
+      elements.topicId.value = '';
+      elements.progress.value = 0;
+      elements.formTitle.textContent = '新增选题';
+      elements.submitBtn.textContent = '保存选题';
+    }
+
+    function fillDirectionFilter() {
+      const currentValue = elements.directionFilter.value;
+      const uniqueDirections = [...new Set(topics.map(t => t.direction))].sort((a, b) => a.localeCompare(b, 'zh-CN'));
+
+      elements.directionFilter.innerHTML = '<option value="">全部方向</option>';
+      uniqueDirections.forEach(direction => {
+        const option = document.createElement('option');
+        option.value = direction;
+        option.textContent = direction;
+        elements.directionFilter.appendChild(option);
+      });
+
+      elements.directionFilter.value = uniqueDirections.includes(currentValue) ? currentValue : '';
+    }
+
+    function getFilteredTopics() {
+      const keyword = elements.searchInput.value.trim().toLowerCase();
+      const selectedDirection = elements.directionFilter.value;
+      const selectedStage = elements.stageFilter.value;
+
+      return topics.filter(topic => {
+        const text = [
+          topic.title,
+          topic.direction,
+          (topic.keywords || []).join(' '),
+          (topic.references || []).join(' '),
+          (topic.cases || []).join(' '),
+          topic.stage
+        ].join(' ').toLowerCase();
+
+        const hitKeyword = !keyword || text.includes(keyword);
+        const hitDirection = !selectedDirection || topic.direction === selectedDirection;
+        const hitStage = !selectedStage || topic.stage === selectedStage;
+
+        return hitKeyword && hitDirection && hitStage;
+      });
+    }
+
+    function renderTable() {
+      fillDirectionFilter();
+      const data = getFilteredTopics();
+      elements.tableBody.innerHTML = '';
+      elements.emptyState.hidden = data.length !== 0;
+      elements.countInfo.textContent = `共 ${topics.length} 条，当前显示 ${data.length} 条`;
+
+      data.forEach(topic => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <strong>${escapeHtml(topic.title)}</strong>
+            <div class="muted">更新时间：${new Date(topic.updatedAt).toLocaleString()}</div>
+          </td>
+          <td>${escapeHtml(topic.direction)}</td>
+          <td>${(topic.keywords || []).map(k => `<span class="tag">${escapeHtml(k)}</span>`).join('')}</td>
+          <td>
+            <div><strong>文献</strong><br>${toBullet(topic.references)}</div>
+            <div style="margin-top:6px;"><strong>案例</strong><br>${toBullet(topic.cases)}</div>
+          </td>
+          <td>
+            <span class="status">${escapeHtml(topic.stage)}</span>
+            <div>${topic.progress}%</div>
+            <div class="progress-line"><span style="width:${Math.max(0, Math.min(100, Number(topic.progress) || 0))}%"></span></div>
+          </td>
+          <td>
+            <div class="row">
+              <button type="button" class="btn-secondary" data-action="edit" data-id="${topic.id}">编辑</button>
+              <button type="button" class="btn-danger" data-action="delete" data-id="${topic.id}">删除</button>
+            </div>
+          </td>
+        `;
+        elements.tableBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(str = '') {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function toBullet(list = []) {
+      if (!list.length) return '<span class="muted">（无）</span>';
+      return list.map(item => `• ${escapeHtml(item)}`).join('<br>');
+    }
+
+    function upsertTopic(event) {
+      event.preventDefault();
+
+      const id = elements.topicId.value || crypto.randomUUID();
+      const progress = Math.max(0, Math.min(100, Number(elements.progress.value) || 0));
+
+      const topic = {
+        id,
+        title: elements.title.value.trim(),
+        direction: elements.direction.value.trim(),
+        keywords: normalizeKeywords(elements.keywords.value),
+        references: normalizeLines(elements.references.value),
+        cases: normalizeLines(elements.cases.value),
+        stage: elements.stage.value,
+        progress,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (!topic.title || !topic.direction) {
+        alert('请至少填写“论文题目”和“研究方向”。');
+        return;
+      }
+
+      const index = topics.findIndex(t => t.id === id);
+      if (index >= 0) {
+        topics[index] = topic;
+      } else {
+        topics.unshift(topic);
+      }
+
+      saveTopics();
+      resetForm();
+      renderTable();
+    }
+
+    function editTopic(id) {
+      const topic = topics.find(t => t.id === id);
+      if (!topic) return;
+
+      elements.topicId.value = topic.id;
+      elements.title.value = topic.title;
+      elements.direction.value = topic.direction;
+      elements.keywords.value = (topic.keywords || []).join('，');
+      elements.references.value = (topic.references || []).join('\n');
+      elements.cases.value = (topic.cases || []).join('\n');
+      elements.stage.value = topic.stage;
+      elements.progress.value = topic.progress;
+      elements.formTitle.textContent = '编辑选题';
+      elements.submitBtn.textContent = '更新选题';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteTopic(id) {
+      if (!confirm('确定删除这条选题记录吗？')) return;
+      topics = topics.filter(t => t.id !== id);
+      saveTopics();
+      renderTable();
+    }
+
+    function exportExcel() {
+      if (!topics.length) {
+        alert('暂无数据可导出。');
+        return;
+      }
+
+      if (typeof XLSX === 'undefined') {
+        alert('Excel 导出库加载失败，请检查网络后刷新页面重试。');
+        return;
+      }
+
+      const exportRows = topics.map((topic, idx) => ({
+        序号: idx + 1,
+        论文题目: topic.title,
+        研究方向: topic.direction,
+        关键词: (topic.keywords || []).join('；'),
+        参考文献: (topic.references || []).join('；'),
+        案例: (topic.cases || []).join('；'),
+        写作阶段: topic.stage,
+        写作进度: `${topic.progress}%`,
+        更新时间: new Date(topic.updatedAt).toLocaleString()
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(exportRows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '选题列表');
+      XLSX.writeFile(wb, `法学论文选题_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    }
+
+    elements.form.addEventListener('submit', upsertTopic);
+    elements.resetBtn.addEventListener('click', resetForm);
+    elements.searchInput.addEventListener('input', renderTable);
+    elements.directionFilter.addEventListener('change', renderTable);
+    elements.stageFilter.addEventListener('change', renderTable);
+    elements.exportBtn.addEventListener('click', exportExcel);
+    elements.clearAllBtn.addEventListener('click', () => {
+      if (!topics.length) return;
+      if (!confirm('将删除所有本地数据，此操作不可恢复。是否继续？')) return;
+      topics = [];
+      saveTopics();
+      resetForm();
+      renderTable();
+    });
+
+    elements.tableBody.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLButtonElement)) return;
+      const id = target.dataset.id;
+      if (!id) return;
+
+      if (target.dataset.action === 'edit') {
+        editTopic(id);
+      } else if (target.dataset.action === 'delete') {
+        deleteTopic(id);
+      }
+    });
+
+    renderTable();
+  </script>
+</body>
+</html>
