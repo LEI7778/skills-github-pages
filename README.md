@@ -1,16 +1,28 @@
-# GitHub Pages
+# 法学论文选题管理工具（本地网页）
 
-<img src="https://octodex.github.com/images/Professortocat_v2.png" align="right" height="200px" />
+这是一个纯前端的本地网页工具，支持管理法学论文选题信息：
 
-Hey LEI7778!
+- 添加题目、研究方向、关键词、参考文献、案例、写作进度
+- 搜索与筛选
+- 导出 Excel（`.xlsx`）
+- 本地自动保存（浏览器 `localStorage`）
 
-Mona here. I'm done preparing your exercise. Hope you enjoy! 💚
+## 如何打开
 
-Remember, it's self-paced so feel free to take a break! ☕️
+1. 在文件管理器里找到本项目中的 `index.html`。
+2. 双击 `index.html`，会自动用默认浏览器打开。
+3. 直接开始录入数据即可，无需安装数据库或后端。
 
-[![](https://img.shields.io/badge/Go%20to%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/LEI7778/skills-github-pages/issues/1)
+## 使用说明
 
----
+1. 左侧填写选题信息后点击 **保存选题**。
+2. 右侧可通过搜索框 + 方向筛选 + 阶段筛选快速定位。
+3. 每条记录支持 **编辑** 和 **删除**。
+4. 点击 **导出 Excel** 可下载当前全部数据为 `.xlsx` 文件。
+5. 点击 **清空全部数据** 可重置所有本地记录（不可恢复）。
 
-&copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+## 注意事项
 
+- 数据只保存在当前浏览器的本地存储中。
+- 更换浏览器、清理浏览器缓存，数据可能丢失。
+- Excel 导出依赖在线脚本，首次打开页面需要网络可用。
